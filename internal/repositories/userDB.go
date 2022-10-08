@@ -1,4 +1,4 @@
-package handlers
+package repositories
 
 type userMysql struct {
 }
