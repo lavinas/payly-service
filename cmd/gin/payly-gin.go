@@ -2,19 +2,18 @@ package main
 
 import (
 	"context"
-	"io"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/lavinas/payly-service/internal/core/ports"
 	"github.com/lavinas/payly-service/internal/core/services"
 	"github.com/lavinas/payly-service/internal/handlers"
 	"github.com/lavinas/payly-service/internal/repositories"
 	"github.com/lavinas/payly-service/internal/utils"
+	"io"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func main() {
@@ -41,14 +40,15 @@ func ginConf(l ports.Log) *gin.Engine {
 }
 
 func ginRun(l ports.Log, r http.Handler) *http.Server {
-	l.Info("Starting GIN Service at 127.0.0.1:8081")
+	l.Info("starting gin service at 127.0.0.1:8081")
 	srv := &http.Server{Addr: ":8081", Handler: r}
+	quit := make(chan os.Signal, 1)
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			l.Error("listen error: " + err.Error())
+			l.Error("listenner error: " + err.Error())
+			quit <- syscall.SIGTERM
 		}
 	}()
-	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	return srv
@@ -58,8 +58,8 @@ func ginShutDown(l ports.Log, srv *http.Server) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		l.Error("Server Shutdown Error: " + err.Error())
+		l.Error("server Shutdown Error: " + err.Error())
 	}
 	<-ctx.Done()
-	l.Info("GIN Server closed")
+	l.Info("closed gin service at 127.0.0.1:8081")
 }
