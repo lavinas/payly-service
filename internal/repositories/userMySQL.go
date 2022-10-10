@@ -56,7 +56,7 @@ func cachetime(conf ports.Config) int64 {
 
 func deletecache(c map[string]cache) {
 	for key, element := range c {
-		if element.expires < time.Now().Unix(){
+		if element.expires < time.Now().Unix() {
 			delete(c, key)
 		}
 	}

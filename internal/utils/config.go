@@ -11,9 +11,13 @@ type config struct {
 }
 
 func NewConfig() *config {
-	t, err := os.ReadFile("config.json")
+	p, ok := os.LookupEnv("PAYLY_CONF_PATH")
+	if !ok {
+		p = "."
+	}
+	t, err := os.ReadFile(p + "/" + "config.json")
 	if err != nil {
-		panic("Configuration file error. config.json file shoulb be on exec path")
+		panic("Configuration file error. config.json not found")
 	}
 	c := config{}
 	if err := json.Unmarshal(t, &c.config); err != nil {
