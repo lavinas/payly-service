@@ -12,25 +12,30 @@ type authenticate struct {
 	user   ports.User
 	config ports.Config
 	jwt    ports.AuthJWT
+	log    ports.Log
 }
 
-func NewAuthenticate(user ports.User, config ports.Config, jwt ports.AuthJWT) *authenticate {
-	return &authenticate{user: user, config: config, jwt: jwt}
+func NewAuthenticate(user ports.User, config ports.Config, jwt ports.AuthJWT, log ports.Log) *authenticate {
+	return &authenticate{user: user, config: config, jwt: jwt, log: log}
 }
 
 func (a *authenticate) Token(auth domains.AuthIn) (domains.AuthToken, error) {
 	if err := a.validate(auth); err != nil {
+		a.log.Info(auth.Username + " - " + err.Error())
 		return domains.AuthToken{}, err
 	}
 	if err := a.checkClient(auth); err != nil {
+		a.log.Info(auth.Username + " - " + err.Error())
 		return domains.AuthToken{}, err
 	}
 	id, err := a.login(auth)
 	if err != nil {
+		a.log.Info(auth.Username + " - " + err.Error())
 		return domains.AuthToken{}, err
 	}
 	code, lag, err := a.jwt.Get(auth.Id, auth.Username, id)
 	if err != nil {
+		a.log.Info(auth.Username + " - " + err.Error())
 		return domains.AuthToken{}, errors.New("internal_error: generating token")
 	}
 	t := domains.AuthToken{
@@ -38,6 +43,7 @@ func (a *authenticate) Token(auth domains.AuthIn) (domains.AuthToken, error) {
 		Type:   "Bearer",
 		Expire: lag,
 	}
+	a.log.Info(auth.Username + " - OK")
 	return t, nil
 }
 

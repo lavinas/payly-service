@@ -5,12 +5,17 @@
         "pass": "shellbox",
         "pool_size": "100",
         "main_db": "vooo_prod_backend",
-        "shellbox_db": "shellbox"
+        "shellbox_db": "shellbox",
+        "cache_time": "3600"
     },
     "auth": {
         "client_id": "rG2TcFGfu6WQnfX7fwPqJ4M",
         "client_secret": "8dce6e7c4bb6efa1cf065c7deece4d4c564f4ac1",
         "expires_in": "57600",
         "key": "8dce6e7c4bb6efa1cf065c7deece4d4c564f4ac1"
+    },
+    "log": {
+        "info": "true",
+        "path": "."
     }
 }

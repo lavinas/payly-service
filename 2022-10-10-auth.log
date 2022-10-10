@@ -1,0 +1,4 @@
+[LOG] 2022/10/10 - 14:31:15 | alphalogo@alphalogo.com.br - invalid_client: Client authentication failed
+[GIN] 2022/10/10 - 14:31:15 | 401 |    2.212764ms |       127.0.0.1 | POST     "/oauth/token"
+[LOG] 2022/10/10 - 14:31:40 | alphalogo@alphalogo.com.br - OK
+[GIN] 2022/10/10 - 14:31:40 | 200 |   77.033494ms |       127.0.0.1 | POST     "/oauth/token"

@@ -6,14 +6,18 @@ import (
 	"github.com/lavinas/payly-service/internal/handlers"
 	"github.com/lavinas/payly-service/internal/repositories"
 	"github.com/lavinas/payly-service/internal/utils"
+	"io"
 )
 
 func main() {
 	c := utils.NewConfig()
 	u := repositories.NewUserMySQL(c)
 	t := utils.NewauthJWT(c)
-	a := services.NewAuthenticate(u, c, t)
+	l := utils.NewlogFile(c, "auth")
+	a := services.NewAuthenticate(u, c, t, l)
 	h := handlers.NewauthHTTP(a)
+	gin.SetMode(gin.ReleaseMode)
+	gin.DefaultWriter = io.MultiWriter(l.GetFile())
 	r := gin.Default()
 	r.SetTrustedProxies([]string{"localhost"})
 	r.POST("/oauth/token", h.Token)

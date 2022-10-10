@@ -3,38 +3,54 @@ package repositories
 import (
 	"database/sql"
 	"errors"
-	"strconv"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/lavinas/payly-service/internal/core/ports"
+	"strconv"
+	"time"
 )
 
+type cache struct {
+	id      int
+	pass    string
+	expires int64
+}
+
 type userMySQL struct {
-	conf ports.Config
-	db   *sql.DB
+	db    *sql.DB
+	cache map[string]cache
+	time  int64
 }
 
 func NewUserMySQL(conf ports.Config) *userMySQL {
-	return &userMySQL{conf: conf, db: connect(conf)}
+	return &userMySQL{
+		db:    connect(conf),
+		cache: make(map[string]cache),
+		time:  cachetime(conf)}
 }
 
 func (u *userMySQL) GetActive(email string) (int, string, error) {
-	q := "select id, password from " + "user where email = '" + email + "' and status = 1;"
-	r, err := u.db.Query(q)
+	c, ok := u.cache[email]
+	if ok && c.expires >= time.Now().Unix() {
+		return c.id, c.pass, nil
+	}
+	id, pass, err := getDBUser(email, u.db)
 	if err != nil {
-		panic(err)
+		return id, pass, err
 	}
-	if !r.Next() {
-		return 0, "", errors.New("user not found")
-	}
-	var id int
-	var pass string
-	if err := r.Scan(&id, &pass); err != nil {
-		if err != nil {
-			panic(err)
-		}
-	}
+	u.cache[email] = cache{id: id, pass: pass, expires: time.Now().Unix() + u.time}
 	return id, pass, nil
+}
+
+func cachetime(conf ports.Config) int64 {
+	t, err := conf.GetField("db", "cache_time")
+	if err != nil {
+		panic("db configuration error: cachetime")
+	}
+	i, err := strconv.ParseInt(t, 10, 64)
+	if err != nil {
+		panic("db configuration error: cachetime")
+	}
+	return i
 }
 
 func connect(conf ports.Config) *sql.DB {
@@ -72,4 +88,25 @@ func getParam(g map[string]interface{}, p string) string {
 		panic("db configuration error:" + p)
 	}
 	return r.(string)
+}
+
+func getDBUser(email string, db *sql.DB) (int, string, error) {
+	print("db\n")
+	q := "select id, password from " + "user where email = '" + email + "' and status = 1;"
+	r, err := db.Query(q)
+	if err != nil {
+		panic(err)
+	}
+	defer r.Close()
+	if !r.Next() {
+		return 0, "", errors.New("user not found")
+	}
+	var id int
+	var pass string
+	if err := r.Scan(&id, &pass); err != nil {
+		if err != nil {
+			panic(err)
+		}
+	}
+	return id, pass, nil
 }
