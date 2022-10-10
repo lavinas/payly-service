@@ -47,7 +47,7 @@ func write(l *logFile, message string) {
 func initFile(path string, component string) (*os.File, string) {
 	d := time.Now().Format("2006-01-02")
 	fp := path + "/" + d + "-" + component + ".log"
-	f, err := os.OpenFile(fp, os.O_RDWR|os.O_CREATE, 0755)
+	f, err := os.OpenFile(fp, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0755)
 	if err != nil {
 		panic("creating log file error")
 	}

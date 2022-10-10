@@ -19,7 +19,8 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.DefaultWriter = io.MultiWriter(l.GetFile())
 	r := gin.Default()
-	r.SetTrustedProxies([]string{"localhost"})
+	r.SetTrustedProxies([]string{"127.0.0.1"})
 	r.POST("/oauth/token", h.Token)
-	r.Run("localhost:8081")
+	l.Info("Stating GIN Service at 127.0.0.1:8081")
+	r.Run("127.0.0.1:8081")
 }
