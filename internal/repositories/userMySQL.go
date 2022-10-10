@@ -42,6 +42,10 @@ func (u *userMySQL) GetActive(email string) (int, string, error) {
 	return id, pass, nil
 }
 
+func (u *userMySQL) Close() {
+	u.db.Close()
+}
+
 func cachetime(conf ports.Config) int64 {
 	t, err := conf.GetField("db", "cache_time")
 	if err != nil {

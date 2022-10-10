@@ -1,11 +1,10 @@
 package utils
 
 import (
+	"github.com/lavinas/payly-service/internal/core/ports"
 	"os"
 	"strconv"
 	"time"
-
-	"github.com/lavinas/payly-service/internal/core/ports"
 )
 
 type logFile struct {
@@ -34,6 +33,10 @@ func (l *logFile) Info(message string) {
 
 func (l *logFile) Error(message string) {
 	write(l, message)
+}
+
+func (l *logFile) Close() {
+	l.file.Close()
 }
 
 func write(l *logFile, message string) {
