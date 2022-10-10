@@ -37,6 +37,7 @@ func (u *userMySQL) GetActive(email string) (int, string, error) {
 	if err != nil {
 		return id, pass, err
 	}
+	deletecache(u.cache)
 	u.cache[email] = cache{id: id, pass: pass, expires: time.Now().Unix() + u.time}
 	return id, pass, nil
 }
@@ -51,6 +52,14 @@ func cachetime(conf ports.Config) int64 {
 		panic("db configuration error: cachetime")
 	}
 	return i
+}
+
+func deletecache(c map[string]cache) {
+	for key, element := range c {
+		if element.expires < time.Now().Unix(){
+			delete(c, key)
+		}
+	}
 }
 
 func connect(conf ports.Config) *sql.DB {
@@ -91,7 +100,6 @@ func getParam(g map[string]interface{}, p string) string {
 }
 
 func getDBUser(email string, db *sql.DB) (int, string, error) {
-	print("db\n")
 	q := "select id, password from " + "user where email = '" + email + "' and status = 1;"
 	r, err := db.Query(q)
 	if err != nil {
