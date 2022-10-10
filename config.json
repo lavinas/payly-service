@@ -1,0 +1,16 @@
+{
+    "db": {
+        "host": "127.0.0.1:3306",
+        "user": "shellbox",
+        "pass": "shellbox",
+        "pool_size": "100",
+        "main_db": "vooo_prod_backend",
+        "shellbox_db": "shellbox"
+    },
+    "auth": {
+        "client_id": "rG2TcFGfu6WQnfX7fwPqJ4M",
+        "client_secret": "8dce6e7c4bb6efa1cf065c7deece4d4c564f4ac1",
+        "expires_in": "57600",
+        "key": "8dce6e7c4bb6efa1cf065c7deece4d4c564f4ac1"
+    }
+}
