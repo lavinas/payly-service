@@ -11,7 +11,7 @@ type claim struct {
 	ClientId    string `json:"client_id"`
 	Username    string `json:"username"`
 	UserId      int    `json:"user_id"`
-	GenetrateAt int64  `json:"generate_at"`
+	GenetrateAt int64  `json:"generated_at"`
 	ExpiresAt   int64  `json:"expires_at"`
 }
 
